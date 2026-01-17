@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meme Chaos Party</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { overflow: hidden; }
+    .meme { position: absolute; width: 120px; pointer-events: none; }
+    .rain { animation: rain linear forwards; }
+    @keyframes rain { from { transform: translateY(-150px); } to { transform: translateY(110vh); } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-700 via-pink-500 to-red-500 text-white">  <header class="p-4 text-center relative z-10">
+    <h1 class="text-3xl font-bold">🤣 Meme Chaos Party 🤣</h1>
+    <p class="text-sm">Mantul • Kejar Kursor • Hujan • Chaos • Musik</p>
+  </header>  <!-- Control Panel -->  <div class="fixed top-4 right-4 z-20 bg-black/60 p-4 rounded-xl space-y-2">
+    <button onclick="startBounce()" class="bg-blue-500 w-full py-1 rounded">Meme Mantul</button>
+    <button onclick="startChase()" class="bg-green-500 w-full py-1 rounded">Meme Kejar Kursor</button>
+    <button onclick="startRain()" class="bg-purple-500 w-full py-1 rounded">Hujan Meme</button>
+    <button onclick="startChaos()" class="bg-red-500 w-full py-1 rounded">Chaos Meme Party</button>
+    <button onclick="toggleMusic()" class="bg-yellow-400 text-black w-full py-1 rounded">🎵 Musik</button>
+    <input id="memeInput" type="file" accept="image/*" class="w-full text-xs" />
+    <button onclick="addCustomMeme()" class="bg-white text-black w-full py-1 rounded">Tambah Meme</button>
+  </div>  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>  <script>
+    const defaultMemes = [
+      'https://i.imgflip.com/30b1gx.jpg',
+      'https://i.imgflip.com/1bij.jpg',
+      'https://i.imgflip.com/26am.jpg',
+      'https://i.imgflip.com/4t0m5.jpg'
+    ];
+
+    let memes = [];
+    let mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+    document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+    function createMeme(src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'meme rounded-xl shadow-xl';
+      img.style.left = Math.random() * (window.innerWidth - 150) + 'px';
+      img.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+      document.body.appendChild(img);
+      return img;
+    }
+
+    function addCustomMeme() {
+      const input = document.getElementById('memeInput');
+      if (!input.files[0]) return alert('Upload meme dulu 😅');
+      const url = URL.createObjectURL(input.files[0]);
+      defaultMemes.push(url);
+      createMeme(url);
+      input.value = '';
+    }
+
+    // Meme Mantul
+    function startBounce() {
+      const img = createMeme(randomMeme());
+      let vx = 2 + Math.random()*3;
+      let vy = 2 + Math.random()*3;
+      let x = Math.random()*window.innerWidth;
+      let y = Math.random()*window.innerHeight;
+      function move(){
+        x += vx; y += vy;
+        if (x <= 0 || x >= window.innerWidth-120) vx *= -1;
+        if (y <= 0 || y >= window.innerHeight-120) vy *= -1;
+        img.style.left = x+'px'; img.style.top = y+'px';
+        requestAnimationFrame(move);
+      }
+      move();
+    }
+
+    // Meme Kejar Kursor
+    function startChase() {
+      const img = createMeme(randomMeme());
+      let x = Math.random()*window.innerWidth;
+      let y = Math.random()*window.innerHeight;
+      function chase(){
+        x += (mouse.x - x) * 0.02;
+        y += (mouse.y - y) * 0.02;
+        img.style.left = x+'px'; img.style.top = y+'px';
+        requestAnimationFrame(chase);
+      }
+      chase();
+    }
+
+    // Hujan Meme
+    function startRain() {
+      for (let i=0;i<10;i++){
+        const img = createMeme(randomMeme());
+        img.classList.add('rain');
+        img.style.left = Math.random()*window.innerWidth+'px';
+        img.style.animationDuration = (3+Math.random()*4)+'s';
+        setTimeout(()=>img.remove(),7000);
+      }
+    }
+
+    // Chaos Party
+    function startChaos() {
+      for (let i=0;i<30;i++){
+        startBounce();
+        startChase();
+        startRain();
+      }
+    }
+
+    function randomMeme(){ return defaultMemes[Math.floor(Math.random()*defaultMemes.length)]; }
+
+    // Musik
+    function toggleMusic(){
+      const music = document.getElementById('bgMusic');
+      if (music.paused) music.play(); else music.pause();
+    }
+
+  </script></body>
+</html>
